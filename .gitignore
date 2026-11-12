@@ -1,0 +1,11 @@
+data/
+results/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.csv
+*.parquet
+.env
+__pycache__/
+.ipynb_checkpoints/

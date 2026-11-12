@@ -1,0 +1,95 @@
+project_name: JOURNAL_FULL_RUN_V2_1_SCIENTIFIC_COMPLETE
+data_root: /path/to/authorized_data_root
+results_root: /path/to/local_results_root
+data_ready_lock: /path/to/local_DATA_READY.lock
+
+release_dir: release/EXAM_LEVEL_PRELIMINARY_RELEASE
+images_dir: images
+labels_file: labels/FDSE_2026_V10_DIAGNOSIS_EVIDENCE_LABELS_PRE_RELEASE.csv
+
+splits:
+  train_bags: FDSE_2026_V10_TRAIN_BAGS_EXAM_LEVEL.csv
+  val_bags: FDSE_2026_V10_VALIDATION_BAGS_EXAM_LEVEL.csv
+  test_bags: FDSE_2026_V10_TEST_BAGS_EXAM_LEVEL.csv
+  train_images: FDSE_2026_V10_TRAIN_IMAGES_EXAM_LEVEL.csv
+  val_images: FDSE_2026_V10_VALIDATION_IMAGES_EXAM_LEVEL.csv
+  test_images: FDSE_2026_V10_TEST_IMAGES_EXAM_LEVEL.csv
+  adjudication: FDSE_2026_V10_TEST_RADIOLOGIST_ADJUDICATION_EXAM_LEVEL.csv
+
+expected:
+  train_exams: 10357
+  val_exams: 1480
+  test_exams: 2959
+  all_exams: 14796
+  images: 24384
+  diagnoses: 7
+  evidence: 26
+
+scientific_policy:
+  text_mode: teacher_only
+  require_data_ready_lock: true
+  allow_test_threshold_tuning: false
+  allow_test_temperature_tuning: false
+  final_test_requires_complete_adjudication: true
+  final_test_requires_patient_independence: true
+  current_release_is_preliminary: true
+
+image:
+  size: 224
+  max_images_per_exam: 8
+  train_sample_mode: deterministic_random
+  eval_sample_mode: first
+  backbone: efficientnet_b0
+  pretrained: true
+
+text:
+  mode: privileged_teacher_only
+  teacher_distill_weight: 0.15
+
+training:
+  epochs: 30
+  batch_size: 8
+  num_workers: 4
+  lr: 0.0002
+  weight_decay: 0.0001
+  patience: 6
+  amp: true
+  amp_dtype: bfloat16
+  grad_clip: 5.0
+  seeds: [2026, 2027, 2028]
+  threshold_metric: f1
+  default_threshold: 0.5
+
+bootstrap:
+  n_resamples: 1000
+  seed: 2026
+
+models:
+  - baseline_mean_mil
+  - baseline_attention_mil
+  - mm_mil_ca
+  - rg_hgnn
+  - mv_consmil
+  - protorag_net
+
+
+orchestration:
+  resume: true
+  fail_fast: true
+  progress_every_batches: 25
+  save_epoch_predictions: false
+  save_best_only: true
+  make_paper_exports: true
+  heartbeat_seconds: 60
+  estimate_cost_per_gpu_hour_usd: null
+
+reporting:
+  bootstrap_ci: true
+  paired_bootstrap: true
+  calibration: true
+  per_class_metrics: true
+  concept_metrics: true
+  confusion_stats: true
+  threshold_source: validation_only
+  save_raw_logits: true
+  save_embeddings_for_analysis: true

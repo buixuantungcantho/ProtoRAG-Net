@@ -1,0 +1,9 @@
+model_name: protorag_net
+paper_id: PAPER_4_PROTORAG_NET
+hidden_dim: 256
+prototype_count_per_label: 4
+retrieval_top_k: 5
+retrieval_memory_size: 4096
+retrieval_temperature: 0.1
+prototype_weight: 0.2
+retrieval_weight: 0.15
